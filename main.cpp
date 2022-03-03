@@ -1,5 +1,4 @@
 #include <iostream>
-#include <unordered_map>
 #include <vector>
 
 #define coord std::pair<int, int>
@@ -10,16 +9,8 @@ const int height = 10;
 coord start(0, 0);
 coord end(7, 7);
 
-enum DIRECTIONS {
-    no_dir = 0,
-    down = 1,
-    right = 2,
-    left = 4,
-    up = 8
-};
-
-std::unordered_map<int, DIRECTIONS> dir_map;
 std::vector<coord> stack;
+void move(coord pos, const char* notdir);
 
 int arr[width][height] =
 {
@@ -44,10 +35,37 @@ bool visited(coord pos)
     return false;
 }
 
+void checkmove(coord pos, const char* dir)
+{
+    if(dir == "right"){
+        if((arr[pos.first][pos.second] & 2) == 0)
+            if(!visited(coord(pos.first, pos.second + 1)))
+                move(coord(pos.first, pos.second + 1), "left");
+    }
+    else if(dir == "left"){
+        if((arr[pos.first][pos.second] & 4) == 0)
+            if(!visited(coord(pos.first, pos.second - 1)))
+                move(coord(pos.first, pos.second - 1), "right");
+    }
+    else if(dir == "up"){
+        if((arr[pos.first][pos.second] & 8) == 0)
+            if(!visited(coord(pos.first - 1, pos.second)))
+                move(coord(pos.first - 1, pos.second), "down");
+                
+    }
+    else if(dir == "down"){
+        if((arr[pos.first][pos.second] & 1) == 0)
+            if(!visited(coord(pos.first + 1, pos.second)))
+                move(coord(pos.first + 1, pos.second), "up");
+
+    }
+}
+
 bool found = false;
-void move(coord pos, DIRECTIONS notdir)
+void move(coord pos, const char* notdir)
 {
     stack.push_back(pos);
+    
     if(pos == end)
     {
         found = true;
@@ -56,49 +74,33 @@ void move(coord pos, DIRECTIONS notdir)
     if(pos.first < 0 || pos.first >= width || pos.second < 0 || pos.second >= height)
         return;
     
-    for(int i = 0; i < dir_map.size(); i++)
-    {
-        DIRECTIONS dir = dir_map.find(i)->second;
-        if(((arr[pos.first][pos.second] & dir) == 0) && (dir != notdir)){
-            //std::cout << "(" << pos.first << "," << pos.second << ") ";
-            if(dir == right){
-                if(!visited(coord(pos.first, pos.second + 1)))
-                    move(coord(pos.first, pos.second + 1), left);
-                if(found)
-                    return;
-            }
-            if(dir == left){
-                if(!visited(coord(pos.first, pos.second - 1)))
-                    move(coord(pos.first, pos.second - 1), right);
-                if(found)
-                    return;
-            }
-            if(dir == up){
-                if(!visited(coord(pos.first - 1, pos.second)))
-                    move(coord(pos.first - 1, pos.second), down);
-                if(found)
-                    return;
-            }
-            if(dir == down){
-                if(!visited(coord(pos.first + 1, pos.second)))
-                    move(coord(pos.first + 1, pos.second), up);
-                if(found)
-                    return;
-            }
-
-        }
-    }
+    if(notdir != "down")
+        checkmove(pos, "down");
+    if(found)
+        return;
+    
+    if(notdir != "left")
+        checkmove(pos, "left");
+    if(found)
+        return;
+        
+    if(notdir != "right")
+    checkmove(pos, "right");
+    if(found)
+        return;
+    
+    if(notdir != "up")
+    checkmove(pos, "up");
+    if(found)
+        return;
+    
+    
     stack.pop_back();
 }
 
 int main()
 {
-    dir_map.insert({0, down});
-    dir_map.insert({1, left});
-    dir_map.insert({2, right});
-    dir_map.insert({3, up});
-
-    move(start, no_dir);
+    move(start, "nodir");
     
     for(int i = 0; i < stack.size(); i++)
     {
