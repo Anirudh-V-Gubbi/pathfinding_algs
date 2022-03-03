@@ -35,26 +35,46 @@ bool visited(coord pos)
     return false;
 }
 
+bool check_right_wall(coord pos)
+{
+    return ((arr[pos.first][pos.second] % 4) >= 2);
+}
+
+bool check_left_wall(coord pos)
+{
+    return ((arr[pos.first][pos.second] % 8) >= 4);
+}
+
+bool check_up_wall(coord pos)
+{
+    return ((arr[pos.first][pos.second] % 1) >= 8);
+}
+
+bool check_down_wall(coord pos)
+{
+    return ((arr[pos.first][pos.second] % 2) >= 1);
+}
+
 void checkmove(coord pos, const char* dir)
 {
     if(dir == "right"){
-        if((arr[pos.first][pos.second] & 2) == 0)
+        if(!check_right_wall(pos))
             if(!visited(coord(pos.first, pos.second + 1)))
                 move(coord(pos.first, pos.second + 1), "left");
     }
     else if(dir == "left"){
-        if((arr[pos.first][pos.second] & 4) == 0)
+        if(!check_left_wall(pos))
             if(!visited(coord(pos.first, pos.second - 1)))
                 move(coord(pos.first, pos.second - 1), "right");
     }
     else if(dir == "up"){
-        if((arr[pos.first][pos.second] & 8) == 0)
+        if(!check_up_wall(pos))
             if(!visited(coord(pos.first - 1, pos.second)))
                 move(coord(pos.first - 1, pos.second), "down");
                 
     }
     else if(dir == "down"){
-        if((arr[pos.first][pos.second] & 1) == 0)
+        if(!check_down_wall(pos))
             if(!visited(coord(pos.first + 1, pos.second)))
                 move(coord(pos.first + 1, pos.second), "up");
 
