@@ -13,8 +13,8 @@ class PlannerNode:
         self.current_obj.direction_callback("down")  # example 1
         notDir = 'up'
         self.stack = []
-        self.directions = ['up', 'down', 'left', 'right']
-
+        self.directions = ['down', 'left', 'right', 'up']
+        self.found = False
         self.wall_callback(notDir)
         
     
@@ -28,23 +28,35 @@ class PlannerNode:
         current_coords = self.current_obj.current 
            
         self.stack.append(current_coords)
+        
+        if(current_coords == self.current_obj.map.end):
+            self.found = True
+            return
 
         if (notDir != self.directions[0] and not self.current_obj.map.check_top_wall(current_coords) and ((current_coords[0] - 1, current_coords[1]) not in self.stack)):
             self.current_obj.direction_callback(self.directions[0])
             wall_callback(self.directions[1])
+            if(self.found):
+                return
             
 
         if (notDir != self.directions[1] and not self.current_obj.map.check_bottom_wall(current_coords) and ((current_coords[0] + 1, current_coords[1]) not in self.stack)):
             self.current_obj.direction_callback(self.directions[1])
             wall_callback(self.directions[0])
+            if(self.found):
+                return
 
         if (notDir != self.directions[2] and not self.current_obj.map.check_left_wall(current_coords) and ((current_coords[0], current_coords[1] - 1) not in self.stack)):
             self.current_obj.direction_callback(self.directions[2])
             wall_callback(self.directions[3])
+            if(self.found):
+                return
 
         if (notDir != self.directions[3] and not self.current_obj.map.check_right_wall(current_coords) and ((current_coords[0], current_coords[1] + 1) not in self.stack)):
             self.current_obj.direction_callback(self.directions[3])
             wall_callback(self.directions[2])
+            if(self.found):
+                return
 
         stack.pop()
         self.current_obj.direction_callback(notDir)
@@ -54,4 +66,3 @@ class PlannerNode:
 if __name__ == '__main__':
     start_obj=PlannerNode()
     start_obj.current_obj.print_root.mainloop()
-
